@@ -17,6 +17,11 @@ export class CadenceController {
     return this.cadenceService.getCadenceById(id);
   }
 
+  @Get()
+  getAll() {
+    return this.cadenceService.getAllCadences();
+  }
+
 
   @Put(':id')
   update(

@@ -31,6 +31,13 @@ export class CadenceService {
     };
   }
 
+  getAllCadences() {
+    return {
+      success: true,
+      data: Array.from(this.cadences.values()),
+    };
+  }
+
   updateCadence(id: string, dto: Partial<CreateCadenceDto>) {
     const existing = this.cadences.get(id);
 

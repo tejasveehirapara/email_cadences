@@ -29,7 +29,7 @@ export default function CadencesPage() {
 
   const router = useRouter()
   const [cadenceId, setCadenceId] = useState('');
-  const [json, setJson] = useState<Cadence | null>(null);
+  const [json, setJson] = useState<Cadence | string | null>(null);
   const [action, setAction] = useState<'create' | 'load' | 'update' | null>(null);
 
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' | null }>({
@@ -39,18 +39,20 @@ export default function CadencesPage() {
 
   const handleCreate = async () => {
     try {
-      const parsed = json;
+      if (!json || typeof json === 'string') {
+        throw new Error('Please provide valid JSON configuration');
+      }
       const res = await fetch('http://localhost:4000/cadences', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(dummyCadence),
+        body: JSON.stringify(json),
       });
       const data = await res.json();
       setJson(data?.data)
-    } catch (error) {
-      setMessage({ text: 'Error: Invalid JSON format.', type: 'error' });
+    } catch (error: any) {
+      setMessage({ text: error.message || 'Error: Invalid JSON format.', type: 'error' });
     }
   };
 
@@ -63,7 +65,9 @@ export default function CadencesPage() {
 
   const handleUpdate = async () => {
     try {
-
+      if (typeof json === 'string') {
+        throw new Error('Cannot update with invalid JSON');
+      }
       const res = await fetch(`http://localhost:4000/cadences/${cadenceId}`, {
         method: 'PUT',
         headers: {
@@ -72,8 +76,8 @@ export default function CadencesPage() {
         body: JSON.stringify(json),
       });
       const data = await res.json();
-    } catch (error) {
-      setMessage({ text: 'Error: Invalid JSON format.', type: 'error' });
+    } catch (error: any) {
+      setMessage({ text: error.message || 'Error: Invalid JSON format.', type: 'error' });
     }
   };
 
@@ -92,7 +96,19 @@ export default function CadencesPage() {
               <p className="text-indigo-100 text-sm">Demo Interface</p>
             </div>
           </div>
-          <button className="bg-indigo-600 p-2 rounded-lg cursor-pointer" onClick={() => router.push('/enrollments')}>Enrollments</button>
+          <button className="
+    bg-white/10
+    hover:bg-white/20
+    cursor-pointer
+    text-white
+    px-4 py-2
+    rounded-lg
+    text-sm font-medium
+    transition-all
+    backdrop-blur-sm
+    border border-white/20
+    active:scale-[0.98]
+  " onClick={() => router.push('/enrollments')}>Enrollments</button>
         </div>
 
         <div className="p-8 space-y-6">
@@ -138,11 +154,22 @@ export default function CadencesPage() {
           {/* JSON Textarea */}
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700">Cadence Configuration (JSON)</label>
+            <p className="text-xs text-gray-500 mt-1">
+              Edit the JSON to define your cadence workflow steps (SEND_EMAIL, WAIT, etc.).
+            </p>
             <div className="relative">
               <textarea
                 rows={12}
                 value={(typeof json === 'object' && json !== null) ? JSON.stringify(json, null, 2) : (json || '')}
-                onChange={(e) => setJson(JSON.parse(e.target.value))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  try {
+                    const parsed = JSON.parse(value);
+                    setJson(parsed);
+                  } catch {
+                    setJson(value);
+                  }
+                }}
                 className="w-full p-4 bg-gray-900 text-indigo-300 font-mono text-sm rounded-xl border-none focus:ring-2 focus:ring-indigo-500/20 resize-none shadow-inner"
               />
               <div className="absolute top-2 right-2 px-2 py-1 bg-gray-800 text-[10px] text-gray-400 rounded uppercase font-bold tracking-widest">
