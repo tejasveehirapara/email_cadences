@@ -5,14 +5,26 @@ import { useRouter } from 'next/navigation';
 import { Mail, List, Plus, Eye, Send, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-toastify';
 
+interface Cadence {
+    id: string;
+    name?: string;
+    data?: any;
+}
+
+interface Enrollment {
+    id: string;
+    cadenceId: string;
+    contactEmail: string;
+    status: string;
+}
+
 export default function EnrollmentsPage() {
     const router = useRouter();
 
     const [cadenceId, setCadenceId] = useState('');
-    const [cadences, setCadences] = useState([]);
+    const [cadences, setCadences] = useState<Cadence[]>([]);
     const [email, setEmail] = useState('');
-    const [enrollments, setEnrollments] = useState([
-    ]);
+    const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
 
     useEffect(() => {
         handleGetCadences();
@@ -139,7 +151,7 @@ export default function EnrollmentsPage() {
                                         onChange={(e) => setCadenceId(e.target.value)}
                                     >
                                         <option value="">Select a cadence...</option>
-                                        {cadences.map((cad: any) => (
+                                        {cadences.map((cad) => (
                                             <option key={cad.id} value={cad.id}>
                                                 {cad.id}
                                             </option>
@@ -225,7 +237,7 @@ export default function EnrollmentsPage() {
                                                 </td>
                                                 <td className="px-8 py-5 text-right">
                                                     <button
-                                                        onClick={() => router.push(`/enrollments/${enr.cadenceId}`)}
+                                                        onClick={() => router.push(`/enrollments/${enr.id}`)}
                                                         className="inline-flex items-center gap-2 text-indigo-600 hover:text-white font-bold text-xs transition-all px-5 py-2.5 rounded-xl hover:bg-indigo-600 border border-indigo-100 hover:border-transparent group-hover:shadow-lg group-hover:shadow-indigo-100"
                                                     >
                                                         <Eye className="w-4 h-4" />
