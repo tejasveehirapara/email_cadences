@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, List, Plus, Eye, Send, ArrowLeft } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 export default function EnrollmentsPage() {
     const router = useRouter();
@@ -19,30 +20,49 @@ export default function EnrollmentsPage() {
     }, []);
 
     const handleGetCadences = async () => {
-        const response = await fetch('http://localhost:4000/cadences', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        const data = await response.json();
-        setCadences(data.data);
+        try {
+            const response = await fetch('http://localhost:4000/cadences', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setCadences(data.data);
+            } else {
+                toast.error(data.message || 'Failed to fetch cadences');
+            }
+        } catch (error) {
+            toast.error('Network error while fetching cadences');
+        }
     };
 
     const handleGetEnrollments = async () => {
-        const response = await fetch('http://localhost:4000/enrollments', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-        const data = await response.json();
-        setEnrollments(data);
+        try {
+            const response = await fetch('http://localhost:4000/enrollments', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setEnrollments(data);
+            } else {
+                toast.error('Failed to fetch enrollments');
+            }
+        } catch (error) {
+            toast.error('Network error while fetching enrollments');
+        }
     };
 
     const startEnrollment = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!cadenceId || !email) return;
+        if (!cadenceId || !email) {
+            toast.warning('Please select a cadence and enter an email');
+            return;
+        }
 
         try {
             const response = await fetch('http://localhost:4000/enrollments', {
@@ -57,10 +77,17 @@ export default function EnrollmentsPage() {
             });
 
             const data = await response.json();
-            handleGetEnrollments()
+            if (response.ok) {
+                toast.success('Enrollment started successfully!');
+                setEmail('');
+                handleGetEnrollments();
+            } else {
+                toast.error(data.message || 'Failed to start enrollment');
+            }
 
         } catch (error) {
             console.error('Failed to start enrollment:', error);
+            toast.error('Network error while starting enrollment');
         }
     };
 

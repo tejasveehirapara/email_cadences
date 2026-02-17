@@ -3,7 +3,7 @@ import * as activities from "./activities/sendEmail.activity";
 
 async function run() {
   const worker = await Worker.create({
-    workflowsPath: require.resolve("./workflows/cadence.workflow"),
+    workflowsPath: require.resolve("./workflows/cadence.workflow.ts"),
     activities,
     taskQueue: "cadence-queue", // ⚠ must match API
   });

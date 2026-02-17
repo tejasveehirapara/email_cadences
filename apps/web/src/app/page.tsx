@@ -3,6 +3,7 @@
 import { AlertCircle, CheckCircle2, Database, Mail, Play, Plus, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function CadencesPage() {
   const dummyCadence = {
@@ -32,11 +33,6 @@ export default function CadencesPage() {
   const [json, setJson] = useState<Cadence | string | null>(null);
   const [action, setAction] = useState<'create' | 'load' | 'update' | null>(null);
 
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' | null }>({
-    text: '',
-    type: null,
-  });
-
   const handleCreate = async () => {
     try {
       if (!json || typeof json === 'string') {
@@ -50,17 +46,30 @@ export default function CadencesPage() {
         body: JSON.stringify(json),
       });
       const data = await res.json();
-      setJson(data?.data)
+      if (res.ok) {
+        setJson(data?.data);
+        toast.success('Cadence created successfully!');
+      } else {
+        toast.error(data?.message || 'Failed to create cadence');
+      }
     } catch (error: any) {
-      setMessage({ text: error.message || 'Error: Invalid JSON format.', type: 'error' });
+      toast.error(error.message || 'Error: Invalid JSON format.');
     }
   };
 
   const handleLoad = async () => {
-    const res = await fetch(`http://localhost:4000/cadences/${cadenceId}`);
-    const data = await res.json();
-    console.log(data, "datadata")
-    setJson(data?.data);
+    try {
+      const res = await fetch(`http://localhost:4000/cadences/${cadenceId}`);
+      const data = await res.json();
+      if (res.ok) {
+        setJson(data?.data);
+        toast.success('Cadence loaded successfully!');
+      } else {
+        toast.error(data?.message || 'Cadence not found');
+      }
+    } catch (error: any) {
+      toast.error('Failed to load cadence');
+    }
   };
 
   const handleUpdate = async () => {
@@ -76,8 +85,13 @@ export default function CadencesPage() {
         body: JSON.stringify(json),
       });
       const data = await res.json();
+      if (res.ok) {
+        toast.success('Cadence updated successfully!');
+      } else {
+        toast.error(data?.message || 'Failed to update cadence');
+      }
     } catch (error: any) {
-      setMessage({ text: error.message || 'Error: Invalid JSON format.', type: 'error' });
+      toast.error(error.message || 'Error: Invalid JSON format.');
     }
   };
 
@@ -202,7 +216,7 @@ export default function CadencesPage() {
               Generate Workflow
             </button>
             <button
-              disabled={!action}
+              // disabled={!action}
               onClick={handleUpdate}
               className="flex-1 flex items-center justify-center gap-2 bg-white border border-gray-200 hover:border-indigo-300 hover:text-indigo-600 text-gray-600 px-6 py-2.5 rounded-lg font-semibold transition-all active:scale-[0.98] 
     disabled:bg-gray-300
@@ -216,19 +230,6 @@ export default function CadencesPage() {
               Update
             </button>
           </div>
-
-          {/* Status Message */}
-          {message.text && (
-            <div className={`flex items-center gap-3 p-4 rounded-xl border ${message.type === 'success' ? 'bg-green-50 border-green-100 text-green-700' :
-              message.type === 'error' ? 'bg-red-50 border-red-100 text-red-700' :
-                'bg-blue-50 border-blue-100 text-blue-700'
-              } transition-all animate-in fade-in slide-in-from-top-2`}>
-              {message.type === 'success' && <CheckCircle2 className="w-5 h-5 flex-shrink-0" />}
-              {message.type === 'error' && <AlertCircle className="w-5 h-5 flex-shrink-0" />}
-              {message.type === 'info' && <Database className="w-5 h-5 flex-shrink-0" />}
-              <span className="text-sm font-medium">{message.text}</span>
-            </div>
-          )}
         </div>
       </div>
     </div>

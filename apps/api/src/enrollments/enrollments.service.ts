@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Client, Connection } from '@temporalio/client';
 import { randomUUID } from 'crypto';
+import { CadenceService } from 'src/cadences/cadence.service';
 
 @Injectable()
 export class EnrollmentsService {
@@ -14,11 +15,17 @@ export class EnrollmentsService {
   // In-memory DB (assessment-friendly)
   private enrollments = new Map<string, any>();
 
+   constructor(
+    private readonly cadenceService: CadenceService, // 👈 ADD THIS
+  ) {}
+
   async createEnrollment(cadenceId: string, contactEmail: string) {
     const id = randomUUID();
 
+    const cadence = this.cadenceService.getCadenceById(cadenceId);
+
     const handle = await this.temporalClient.workflow.start('cadenceWorkflow', {
-      args: [{ cadenceId, contactEmail }],
+      args: [{ cadenceId, contactEmail, steps: cadence.data.steps || [] }],
       taskQueue: process.env.TEMPORAL_TASK_QUEUE || 'cadence-queue',
       workflowId: id,
     });

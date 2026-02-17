@@ -19,7 +19,7 @@ const { sendEmailActivity } = proxyActivities<{
 export const updateCadence = defineSignal<[any[]]>("updateCadence");
 export const getState = defineQuery<any>("getState");
 
-export async function CadenceWorkflow(input: {
+export async function cadenceWorkflow(input: {
   cadenceId: string;
   contactEmail: string;
   steps: any[];
@@ -30,7 +30,7 @@ export async function CadenceWorkflow(input: {
     status: "RUNNING",
     steps: input.steps,
   };
-
+console.log(input, "statestate===>")
   // ✅ Query Handler
   setHandler(getState, () => state);
 

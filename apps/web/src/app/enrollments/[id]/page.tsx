@@ -11,6 +11,7 @@ import {
     ChevronRight,
     CircleDashed
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 export default function EnrollmentStatusPage({ params: paramsPromise }: any) {
     const params: any = use(paramsPromise);
@@ -46,6 +47,7 @@ export default function EnrollmentStatusPage({ params: paramsPromise }: any) {
             ...prev,
             stepsVersion: prev.stepsVersion + 1,
         }));
+        toast.info('Sync signal triggered successfully');
     };
 
     const steps = [
@@ -85,8 +87,8 @@ export default function EnrollmentStatusPage({ params: paramsPromise }: any) {
                             </div>
                         </div>
                         <div className={`px-4 py-1.5 rounded-full text-xs font-bold border tracking-wide ${state.status === 'COMPLETED'
-                                ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                                : 'bg-indigo-50 border-indigo-100 text-indigo-600'
+                            ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
+                            : 'bg-indigo-50 border-indigo-100 text-indigo-600'
                             }`}>
                             {state.status}
                         </div>
@@ -104,8 +106,8 @@ export default function EnrollmentStatusPage({ params: paramsPromise }: any) {
                                     return (
                                         <div key={index} className="flex gap-6 items-start group">
                                             <div className={`relative z-10 flex items-center justify-center w-10 h-10 rounded-full border-4 border-white shadow-sm transition-all duration-500 ${isCompleted ? 'bg-emerald-500 text-white' :
-                                                    isCurrent ? 'bg-indigo-600 text-white' :
-                                                        'bg-slate-100 text-slate-400'
+                                                isCurrent ? 'bg-indigo-600 text-white' :
+                                                    'bg-slate-100 text-slate-400'
                                                 }`}>
                                                 {isCompleted ? (
                                                     <CheckCircle2 className="w-5 h-5" />
@@ -117,8 +119,8 @@ export default function EnrollmentStatusPage({ params: paramsPromise }: any) {
                                             </div>
                                             <div className="flex-1 pt-1.5">
                                                 <h3 className={`font-bold transition-colors ${isCompleted ? 'text-slate-800' :
-                                                        isCurrent ? 'text-indigo-600' :
-                                                            'text-slate-400'
+                                                    isCurrent ? 'text-indigo-600' :
+                                                        'text-slate-400'
                                                     }`}>
                                                     {step.title}
                                                 </h3>
